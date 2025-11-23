@@ -1,0 +1,82 @@
+% Define parameters
+nx = 1201;    % Number of grid points in x-direction
+ny = 711;    % Number of grid points in y-direction
+dx = 4;     % Grid spacing in x-direction (meters)
+dy = 4;     % Grid spacing in y-direction (meters)
+nt = 200;    % Number of time steps
+dt = 0.001;  % Time step (seconds)
+vp = [1500,4500];   % P-wave velocity (m/s)
+vs = 2000;   % S-wave velocity (m/s)
+rho = 2600;  % Density (kg/m^3)
+
+% Define source location
+is = 600;    % Source location in x-direction
+js = 300;    % Source location in y-direction
+
+% Initialize velocity and stress matrices
+v = zeros(nx,ny);
+sxx = zeros(nx,ny);
+syy = zeros(nx,ny);
+sxy = zeros(nx,ny);
+
+% Define damping parameter
+alpha = 0.02;
+
+% Initialize plot
+figure(1);
+imagesc(v');
+clim([-0.2 0.2]);
+colorbar;
+
+% Calculate constants
+c1 = (dt/dx)^2 * rho * vp(1)^2;
+c2 = (dt/dx)^2 * rho * vs^2;
+c3 = (2*alpha*dt - dt^2) / (2*rho*dx^2);
+c4 = (2*alpha*dt - dt^2) / (2*rho*dy^2);
+
+% Main loop
+for n = 1:nt
+    % Update stress matrices
+    for i = 2:nx-1
+        for j = 2:ny-1
+            sxx(i,j) = sxx(i,j) + c1*(v(i+1,j) - v(i,j)) + c2*(v(i,j+1) - v(i,j-1));
+            syy(i,j) = syy(i,j) + c1*(v(i,j+1) - v(i,j)) + c2*(v(i+1,j) - v(i-1,j));
+            sxy(i,j) = sxy(i,j) + c3*(sxx(i+1,j) - 2*sxx(i,j) + sxx(i-1,j)) + c4*(syy(i,j+1) - 2*syy(i,j) + syy(i,j-1));
+        end
+    end
+    
+    % Add source term to stress matrices
+    sxx(is,js) = sxx(is,js) + (dt/dx)^2 * rho * vp(1)^2;
+    syy(is,js) = syy(is,js) + (dt/dx)^2 * rho * vp(1)^2;
+    
+    % Update velocity matrix
+    for i = 2:nx-1
+        for j = 2:ny-1
+            v(i,j) = v(i,j) + c1*(sxx(i,j) - sxx(i-1,j)) + c2*(sxy(i,j+1) - sxy(i,j-1));
+        end
+    end
+    
+    % Plot velocity field
+    if mod(n,10) == 0
+        imagesc(v');
+        clim([-0.2 0.2]);
+        colorbar;
+        drawnow;
+    end
+    % Apply source function
+    v(is,js) = v(is,js) + sin(2*pi*50*n*dt);
+    
+    % Apply boundary conditions
+    v(1,:) = 0;
+    v(nx,:) = 0;
+    v(:,1) = 0;
+    v(:,ny) = 0;
+    
+    % Plot wavefield
+    if mod(n,10) == 0
+        imagesc(v');
+        clim([-0.2 0.2]);
+        colorbar;
+        drawnow;
+    end
+end

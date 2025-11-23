@@ -1,0 +1,49 @@
+%% Define parameters
+nx = 101;   % number of grid points in x-direction
+ny = 101;   % number of grid points in y-direction
+nz = 101;   % number of grid points in z-direction
+dx = 10;    % grid spacing in x-direction (m)
+dy = 10;    % grid spacing in y-direction (m)
+dz = 10;    % grid spacing in z-direction (m)
+dt = 0.001; % time step (s)
+nt = 1000;  % number of time steps
+vp = 2000;  % P-wave velocity (m/s)
+
+%% Initialize velocity and pressure fields
+v = vp*ones(nx,ny,nz);   % homogeneous velocity field
+p = zeros(nx,ny,nz);     % initial pressure field
+
+%% Compute finite difference coefficients
+c1 = 9/8/vp/dt;
+c2 = -1/24/vp/dt;
+c3 = 1/24/dx^2;
+c4 = 1/24/dy^2;
+c5 = 1/24/dz^2;
+
+%% Apply finite difference scheme
+for n = 1:nt
+    % Compute pressure field at next time step using implicit scheme
+    for i = 2:nx-1
+        for j = 2:ny-1
+            for k = 2:nz-1
+                lap_p = (p(i+1,j,k)-2*p(i,j,k)+p(i-1,j,k))/dx^2 ...
+                      + (p(i,j+1,k)-2*p(i,j,k)+p(i,j-1,k))/dy^2 ...
+                      + (p(i,j,k+1)-2*p(i,j,k)+p(i,j,k-1))/dz^2;
+                p(i,j,k) = p(i,j,k) + c1*lap_p - c2*v(i,j,k)^2*lap_p;
+            end
+        end
+    end
+    
+    % Apply absorbing boundary conditions using perfectly matched layer
+    % (PML) technique
+    % (omitted in this example code for brevity)
+    
+    % Visualize pressure field at every 10th time step
+    if mod(n,10) == 0
+        h = slice(p,round(nx/2),round(ny/2),round(nz/2));
+        shading interp; colormap jet; axis image; % add a jet colormap
+        set(h, 'EdgeColor', 'none'); % remove the grid lines
+        title(sprintf('Time step %d',n));
+        drawnow;
+    end
+end
