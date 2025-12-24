@@ -41,27 +41,14 @@ Key components include:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/acoustic-wave-fd.git
-cd acoustic-wave-fd
-
-# Install Python dependencies
-pip install -r requirements.txt
+git clone  https://github.com/yourusername/Implicit-finite-difference-scheme-for-acoustic-wave-propagation.git
+cd Implicit-finite-difference-scheme-for-acoustic-wave-propagation
 ```
 
 ## Usage
 
-1. Run Python scripts for visualization:
-
-```bash
-python simulate_wave.py
-```
-
+1. Run Matlab scripts for visualization:
 2. Open MATLAB scripts for further analysis:
-
-```matlab
-wave_propagation_simulation.m
-```
-
 3. Adjust parameters like wave speed, time steps, and spatial resolution to observe different behaviors.
 
 ## Implementation
@@ -81,6 +68,19 @@ wave_propagation_simulation.m
 * Extend simulation to 2D and 3D wave propagation models.
 * Implement GPU acceleration for faster computation.
 * Explore advanced wavelets and boundary conditions for realistic modeling.
+
+## Citation
+
+If you use this work, please cite:
+
+```bibtex
+@software{Implicit-finite-difference-scheme-for-acoustic-wave-propagation,
+  author = {Shubhan Mital},
+  title = {Implicit finite difference scheme for acoustic wave propagation},
+  year = {2025},
+  url = https://github.com/Shubhanflash22/Implicit-finite-difference-scheme-for-acoustic-wave-propagation.git
+}
+```
 
 ## License
 
